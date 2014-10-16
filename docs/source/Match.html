@@ -49,6 +49,13 @@
  */
 Autolinker.match.Match = Autolinker.Util.extend( Object, {
 	
+<span id='Autolinker-match-Match-cfg-matchedText'>	/**
+</span>	 * @cfg {String} matchedText (required)
+	 * 
+	 * The original text that was matched.
+	 */
+	
+	
 <span id='Autolinker-match-Match-method-constructor'>	/**
 </span>	 * @constructor
 	 * @param {Object} cfg The configuration properties for the Match instance, specified in an Object (map).
@@ -65,6 +72,16 @@ Autolinker.match.Match = Autolinker.Util.extend( Object, {
 	 * @return {String}
 	 */
 	getType : Autolinker.Util.abstractMethod,
+	
+	
+<span id='Autolinker-match-Match-method-getMatchedText'>	/**
+</span>	 * Returns the original text that was matched.
+	 * 
+	 * @return {String}
+	 */
+	getMatchedText : function() {
+		return this.matchedText;
+	},
 	
 
 <span id='Autolinker-match-Match-method-getAnchorHref'>	/**
