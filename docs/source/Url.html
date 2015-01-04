@@ -32,6 +32,13 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * The url that was matched.
 	 */
 	
+<span id='Autolinker-match-Url-cfg-protocolUrlMatch'>	/**
+</span>	 * @cfg {Boolean} protocolUrlMatch (required)
+	 * 
+	 * `true` if the URL is a match which already has a protocol (i.e. 'http://'), `false` if the match was from a 'www' or
+	 * known TLD match.
+	 */
+	
 <span id='Autolinker-match-Url-cfg-protocolRelativeMatch'>	/**
 </span>	 * @cfg {Boolean} protocolRelativeMatch (required)
 	 * 
@@ -62,14 +69,14 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 */
 	protocolRelativeRegex : /^\/\//,
 	
-<span id='Autolinker-match-Url-property-checkForProtocolRegex'>	/**
-</span>	 * @protected
-	 * @property {RegExp} checkForProtocolRegex
+<span id='Autolinker-match-Url-property-protocolPrepended'>	/**
+</span>	 * @private
+	 * @property {Boolean} protocolPrepended
 	 * 
-	 * A regular expression used to check if the {@link #url} is missing a protocol (in which case, 'http://'
-	 * will be added).
+	 * Will be set to `true` if the 'http://' protocol has been prepended to the {@link #url} (because the
+	 * {@link #url} did not have a protocol)
 	 */
-	checkForProtocolRegex: /^[A-Za-z]{3,9}:/,
+	protocolPrepended : false,
 	
 
 <span id='Autolinker-match-Url-method-getType'>	/**
@@ -83,17 +90,19 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	
 	
 <span id='Autolinker-match-Url-method-getUrl'>	/**
-</span>	 * Returns the url that was matched, assuming the protocol to be 'http://' if the match
-	 * was missing a protocol.
+</span>	 * Returns the url that was matched, assuming the protocol to be 'http://' if the original
+	 * match was missing a protocol.
 	 * 
 	 * @return {String}
 	 */
 	getUrl : function() {
 		var url = this.url;
 		
-		// if the url string doesn't begin with a protocol, assume http://
-		if( !this.protocolRelativeMatch &amp;&amp; !this.checkForProtocolRegex.test( url ) ) {
+		// if the url string doesn't begin with a protocol, assume 'http://'
+		if( !this.protocolRelativeMatch &amp;&amp; !this.protocolUrlMatch &amp;&amp; !this.protocolPrepended ) {
 			url = this.url = 'http://' + url;
+			
+			this.protocolPrepended = true;
 		}
 		
 		return url;

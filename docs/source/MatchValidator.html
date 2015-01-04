@@ -16,6 +16,7 @@
 </head>
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global Autolinker */
+/*jshint scripturl:true */
 <span id='Autolinker-MatchValidator'>/**
 </span> * @private
  * @class Autolinker.MatchValidator
@@ -51,15 +52,17 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * @private
 	 * @property {RegExp} hasFullProtocolRegex
 	 */
-	hasFullProtocolRegex : /^[A-Za-z]{3,9}:\/\//,
+	hasFullProtocolRegex : /^[A-Za-z][-.+A-Za-z0-9]+:\/\//,
 	
-<span id='Autolinker-MatchValidator-property-hasProtocolPrefixRegex'>	/**
-</span>	 * Regex to test for a protocol prefix, such as 'mailto:'
+<span id='Autolinker-MatchValidator-property-uriSchemeRegex'>	/**
+</span>	 * Regex to find the URI scheme, such as 'mailto:'.
+	 * 
+	 * This is used to filter out 'javascript:' and 'vbscript:' schemes.
 	 * 
 	 * @private
-	 * @property {RegExp} hasProtocolPrefixRegex
+	 * @property {RegExp} uriSchemeRegex
 	 */
-	hasProtocolPrefixRegex : /^[A-Za-z]{3,9}:/,
+	uriSchemeRegex : /^[A-Za-z][-.+A-Za-z0-9]+:/,
 	
 <span id='Autolinker-MatchValidator-property-hasWordCharAfterProtocolRegex'>	/**
 </span>	 * Regex to determine if at least one word char exists after the protocol (i.e. after the ':')
@@ -67,7 +70,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * @private
 	 * @property {RegExp} hasWordCharAfterProtocolRegex
 	 */
-	hasWordCharAfterProtocolRegex : /:.*?[A-Za-z]/,
+	hasWordCharAfterProtocolRegex : /:[^\s]*?[A-Za-z]/,
 	
 	
 <span id='Autolinker-MatchValidator-method-isValidMatch'>	/**
@@ -93,14 +96,31 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 */
 	isValidMatch : function( urlMatch, protocolUrlMatch, protocolRelativeMatch ) {
 		if(
-			this.urlMatchDoesNotHaveProtocolOrDot( urlMatch, protocolUrlMatch ) ||  // At least one period ('.') must exist in the URL match for us to consider it an actual URL, *unless* it was a full protocol match (like 'http://localhost')
-			this.urlMatchDoesNotHaveAtLeastOneWordChar( urlMatch ) ||               // At least one letter character must exist in the domain name after a protocol match. Ex: skip over something like &quot;git:1.0&quot;
-			this.isInvalidProtocolRelativeMatch( protocolRelativeMatch )            // A protocol-relative match which has a word character in front of it (so we can skip something like &quot;abc//google.com&quot;)
+			( protocolUrlMatch &amp;&amp; !this.isValidUriScheme( protocolUrlMatch ) ) ||
+			this.urlMatchDoesNotHaveProtocolOrDot( urlMatch, protocolUrlMatch ) ||       // At least one period ('.') must exist in the URL match for us to consider it an actual URL, *unless* it was a full protocol match (like 'http://localhost')
+			this.urlMatchDoesNotHaveAtLeastOneWordChar( urlMatch, protocolUrlMatch ) ||  // At least one letter character must exist in the domain name after a protocol match. Ex: skip over something like &quot;git:1.0&quot;
+			this.isInvalidProtocolRelativeMatch( protocolRelativeMatch )                 // A protocol-relative match which has a word character in front of it (so we can skip something like &quot;abc//google.com&quot;)
 		) {
 			return false;
 		}
 		
 		return true;
+	},
+	
+	
+<span id='Autolinker-MatchValidator-method-isValidUriScheme'>	/**
+</span>	 * Determines if the URI scheme is a valid scheme to be autolinked. Returns `false` if the scheme is 
+	 * 'javascript:' or 'vbscript:'
+	 * 
+	 * @private
+	 * @param {String} uriSchemeMatch The match URL string for a full URI scheme match. Ex: 'http://yahoo.com' 
+	 *   or 'mailto:a@a.com'.
+	 * @return {Boolean} `true` if the scheme is a valid one, `false` otherwise.
+	 */
+	isValidUriScheme : function( uriSchemeMatch ) {
+		var uriScheme = uriSchemeMatch.match( this.uriSchemeRegex )[ 0 ];
+		
+		return ( uriScheme !== 'javascript:' &amp;&amp; uriScheme !== 'vbscript:' );
 	},
 	
 	
@@ -121,7 +141,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 *   match.
 	 */
 	urlMatchDoesNotHaveProtocolOrDot : function( urlMatch, protocolUrlMatch ) {
-		return ( urlMatch &amp;&amp; ( !protocolUrlMatch || !this.hasFullProtocolRegex.test( protocolUrlMatch ) ) &amp;&amp; urlMatch.indexOf( '.' ) === -1 );
+		return ( !!urlMatch &amp;&amp; ( !protocolUrlMatch || !this.hasFullProtocolRegex.test( protocolUrlMatch ) ) &amp;&amp; urlMatch.indexOf( '.' ) === -1 );
 	},
 	
 	
@@ -133,11 +153,18 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * 
 	 * @private
 	 * @param {String} urlMatch The matched URL, if there was one. Will be an empty string if the match is not a URL match.
+	 * @param {String} protocolUrlMatch The match URL string for a protocol match. Ex: 'http://yahoo.com'. This is used to
+	 *   know whether or not we have a protocol in the URL string, in order to check for a word character after the protocol
+	 *   separator (':').
 	 * @return {Boolean} `true` if the URL match does not have at least one word character in it after the protocol, `false`
 	 *   otherwise.
 	 */
-	urlMatchDoesNotHaveAtLeastOneWordChar : function( urlMatch ) {
-		return ( urlMatch &amp;&amp; this.hasProtocolPrefixRegex.test( urlMatch ) &amp;&amp; !this.hasWordCharAfterProtocolRegex.test( urlMatch ) );
+	urlMatchDoesNotHaveAtLeastOneWordChar : function( urlMatch, protocolUrlMatch ) {
+		if( urlMatch &amp;&amp; protocolUrlMatch ) {
+			return !this.hasWordCharAfterProtocolRegex.test( urlMatch );
+		} else {
+			return false;
+		}
 	},
 	
 	
@@ -153,7 +180,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * @return {Boolean} `true` if it is an invalid protocol-relative match, `false` otherwise.
 	 */
 	isInvalidProtocolRelativeMatch : function( protocolRelativeMatch ) {
-		return ( protocolRelativeMatch &amp;&amp; this.invalidProtocolRelMatchRegex.test( protocolRelativeMatch ) );
+		return ( !!protocolRelativeMatch &amp;&amp; this.invalidProtocolRelMatchRegex.test( protocolRelativeMatch ) );
 	}
 
 } );</pre>
