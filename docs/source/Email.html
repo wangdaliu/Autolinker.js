@@ -22,7 +22,7 @@
  * 
  * Represents a Email match found in an input string which should be Autolinked.
  * 
- * See this class's superclass ({@link Autolinker.match.Match}) for more details.
+ * See this class&#39;s superclass ({@link Autolinker.match.Match}) for more details.
  */
 Autolinker.match.Email = Autolinker.Util.extend( Autolinker.match.Match, {
 	
@@ -39,7 +39,7 @@ Autolinker.match.Email = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getType : function() {
-		return 'email';
+		return &#39;email&#39;;
 	},
 	
 	
@@ -59,7 +59,7 @@ Autolinker.match.Email = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getAnchorHref : function() {
-		return 'mailto:' + this.email;
+		return &#39;mailto:&#39; + this.email;
 	},
 	
 	

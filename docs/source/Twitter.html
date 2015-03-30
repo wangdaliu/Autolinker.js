@@ -22,7 +22,7 @@
  * 
  * Represents a Twitter match found in an input string which should be Autolinked.
  * 
- * See this class's superclass ({@link Autolinker.match.Match}) for more details.
+ * See this class&#39;s superclass ({@link Autolinker.match.Match}) for more details.
  */
 Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 	
@@ -39,7 +39,7 @@ Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getType : function() {
-		return 'twitter';
+		return &#39;twitter&#39;;
 	},
 	
 	
@@ -59,7 +59,7 @@ Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getAnchorHref : function() {
-		return 'https://twitter.com/' + this.twitterHandle;
+		return &#39;https://twitter.com/&#39; + this.twitterHandle;
 	},
 	
 	
@@ -69,7 +69,7 @@ Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getAnchorText : function() {
-		return '@' + this.twitterHandle;
+		return &#39;@&#39; + this.twitterHandle;
 	}
 	
 } );</pre>

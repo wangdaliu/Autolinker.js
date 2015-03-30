@@ -22,7 +22,7 @@
  * 
  * Represents a Url match found in an input string which should be Autolinked.
  * 
- * See this class's superclass ({@link Autolinker.match.Match}) for more details.
+ * See this class&#39;s superclass ({@link Autolinker.match.Match}) for more details.
  */
 Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	
@@ -35,14 +35,14 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 <span id='Autolinker-match-Url-cfg-protocolUrlMatch'>	/**
 </span>	 * @cfg {Boolean} protocolUrlMatch (required)
 	 * 
-	 * `true` if the URL is a match which already has a protocol (i.e. 'http://'), `false` if the match was from a 'www' or
+	 * `true` if the URL is a match which already has a protocol (i.e. &#39;http://&#39;), `false` if the match was from a &#39;www&#39; or
 	 * known TLD match.
 	 */
 	
 <span id='Autolinker-match-Url-cfg-protocolRelativeMatch'>	/**
 </span>	 * @cfg {Boolean} protocolRelativeMatch (required)
 	 * 
-	 * `true` if the URL is a protocol-relative match. A protocol-relative match is a URL that starts with '//',
+	 * `true` if the URL is a protocol-relative match. A protocol-relative match is a URL that starts with &#39;//&#39;,
 	 * and will be either http:// or https:// based on the protocol that the site is loaded under.
 	 */
 	
@@ -56,7 +56,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 </span>	 * @private
 	 * @property {RegExp} urlPrefixRegex
 	 * 
-	 * A regular expression used to remove the 'http://' or 'https://' and/or the 'www.' from URLs.
+	 * A regular expression used to remove the &#39;http://&#39; or &#39;https://&#39; and/or the &#39;www.&#39; from URLs.
 	 */
 	urlPrefixRegex: /^(https?:\/\/)?(www\.)?/i,
 	
@@ -64,7 +64,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 </span>	 * @private
 	 * @property {RegExp} protocolRelativeRegex
 	 * 
-	 * The regular expression used to remove the protocol-relative '//' from the {@link #url} string, for purposes
+	 * The regular expression used to remove the protocol-relative &#39;//&#39; from the {@link #url} string, for purposes
 	 * of {@link #getAnchorText}. A protocol-relative URL is, for example, &quot;//yahoo.com&quot;
 	 */
 	protocolRelativeRegex : /^\/\//,
@@ -73,7 +73,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 </span>	 * @private
 	 * @property {Boolean} protocolPrepended
 	 * 
-	 * Will be set to `true` if the 'http://' protocol has been prepended to the {@link #url} (because the
+	 * Will be set to `true` if the &#39;http://&#39; protocol has been prepended to the {@link #url} (because the
 	 * {@link #url} did not have a protocol)
 	 */
 	protocolPrepended : false,
@@ -85,12 +85,12 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String}
 	 */
 	getType : function() {
-		return 'url';
+		return &#39;url&#39;;
 	},
 	
 	
 <span id='Autolinker-match-Url-method-getUrl'>	/**
-</span>	 * Returns the url that was matched, assuming the protocol to be 'http://' if the original
+</span>	 * Returns the url that was matched, assuming the protocol to be &#39;http://&#39; if the original
 	 * match was missing a protocol.
 	 * 
 	 * @return {String}
@@ -98,9 +98,9 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	getUrl : function() {
 		var url = this.url;
 		
-		// if the url string doesn't begin with a protocol, assume 'http://'
+		// if the url string doesn&#39;t begin with a protocol, assume &#39;http://&#39;
 		if( !this.protocolRelativeMatch &amp;&amp; !this.protocolUrlMatch &amp;&amp; !this.protocolPrepended ) {
-			url = this.url = 'http://' + url;
+			url = this.url = &#39;http://&#39; + url;
 			
 			this.protocolPrepended = true;
 		}
@@ -117,7 +117,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	getAnchorHref : function() {
 		var url = this.getUrl();
 		
-		return url.replace( /&amp;amp;/g, '&amp;' );  // any &amp;amp;'s in the URL should be converted back to '&amp;' if they were displayed as &amp;amp; in the source html 
+		return url.replace( /&amp;amp;/g, &#39;&amp;&#39; );  // any &amp;amp;&#39;s in the URL should be converted back to &#39;&amp;&#39; if they were displayed as &amp;amp; in the source html 
 	},
 	
 	
@@ -130,7 +130,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 		var anchorText = this.getUrl();
 		
 		if( this.protocolRelativeMatch ) {
-			// Strip off any protocol-relative '//' from the anchor text
+			// Strip off any protocol-relative &#39;//&#39; from the anchor text
 			anchorText = this.stripProtocolRelativePrefix( anchorText );
 		}
 		if( this.stripPrefix ) {
@@ -155,12 +155,12 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String} The `anchorText`, with the prefix stripped.
 	 */
 	stripUrlPrefix : function( text ) {
-		return text.replace( this.urlPrefixRegex, '' );
+		return text.replace( this.urlPrefixRegex, &#39;&#39; );
 	},
 	
 	
 <span id='Autolinker-match-Url-method-stripProtocolRelativePrefix'>	/**
-</span>	 * Strips any protocol-relative '//' from the anchor text.
+</span>	 * Strips any protocol-relative &#39;//&#39; from the anchor text.
 	 * 
 	 * @private
 	 * @param {String} text The text of the anchor that is being generated, for which to strip off the
@@ -168,7 +168,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * @return {String} The `anchorText`, with the protocol-relative prefix stripped.
 	 */
 	stripProtocolRelativePrefix : function( text ) {
-		return text.replace( this.protocolRelativeRegex, '' );
+		return text.replace( this.protocolRelativeRegex, &#39;&#39; );
 	},
 	
 	
@@ -177,11 +177,11 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * 
 	 * @private
 	 * @param {String} anchorText The text of the anchor that is being generated, for which to remove any trailing
-	 *   slash ('/') that may exist.
+	 *   slash (&#39;/&#39;) that may exist.
 	 * @return {String} The `anchorText`, with the trailing slash removed.
 	 */
 	removeTrailingSlash : function( anchorText ) {
-		if( anchorText.charAt( anchorText.length - 1 ) === '/' ) {
+		if( anchorText.charAt( anchorText.length - 1 ) === &#39;/&#39; ) {
 			anchorText = anchorText.slice( 0, -1 );
 		}
 		return anchorText;
