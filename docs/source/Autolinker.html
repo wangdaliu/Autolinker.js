@@ -77,7 +77,7 @@
  *                     } else {
  *                         return true;  // let Autolinker perform its normal anchor tag replacement
  *                     }
- *                 
+ *
  *                 case &#39;email&#39; :
  *                     var email = match.getEmail();
  *                     console.log( &quot;email: &quot;, email );
@@ -302,8 +302,8 @@ Autolinker.prototype = {
 				}
 				resultHtml.push( nodeText );  // now add the text of the tag itself verbatim
 
-			} else if( nodeType === &#39;entity&#39; ) {
-				resultHtml.push( nodeText );  // append HTML entity nodes (such as &#39;&amp;nbsp;&#39;) verbatim
+			} else if( nodeType === &#39;entity&#39; || nodeType === &#39;comment&#39; ) {
+				resultHtml.push( nodeText );  // append HTML entity nodes (such as &#39;&amp;nbsp;&#39;) or HTML comments (such as &#39;&lt;!-- Comment --&gt;&#39;) verbatim
 
 			} else {
 				// Process text nodes in the input `textOrHtml`
