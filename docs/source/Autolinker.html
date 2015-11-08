@@ -119,15 +119,24 @@
  * - An {@link Autolinker.HtmlTag} instance, which can be used to build/modify an HTML tag before writing out its HTML text.
  *
  * @constructor
- * @param {Object} [config] The configuration options for the Autolinker instance, specified in an Object (map).
+ * @param {Object} [cfg] The configuration options for the Autolinker instance, specified in an Object (map).
  */
 var Autolinker = function( cfg ) {
 	Autolinker.Util.assign( this, cfg );  // assign the properties of `cfg` onto the Autolinker instance. Prototype properties will be used for missing configs.
 
 	// Validate the value of the `hashtag` cfg.
 	var hashtag = this.hashtag;
-	if( hashtag !== false &amp;&amp; hashtag !== &#39;twitter&#39; &amp;&amp; hashtag !== &#39;facebook&#39; ) {
+	if( hashtag !== false &amp;&amp; hashtag !== &#39;twitter&#39; &amp;&amp; hashtag !== &#39;facebook&#39; &amp;&amp; hashtag !== &#39;instagram&#39; ) {
 		throw new Error( &quot;invalid `hashtag` cfg - see docs&quot; );
+	}
+
+	// Normalize the `truncate` option if provided
+	var truncate = this.truncate = this.truncate || {};
+	if( typeof truncate === &#39;number&#39; ) {
+		this.truncate = { length: truncate, location: &#39;end&#39; };
+	} else if( typeof truncate === &#39;object&#39; ) {
+		this.truncate.length = truncate.length || Number.POSITIVE_INFINITY;
+		this.truncate.location = truncate.location || &#39;end&#39;;
 	}
 };
 
@@ -170,6 +179,7 @@ Autolinker.prototype = {
 	 *
 	 * - &#39;twitter&#39;
 	 * - &#39;facebook&#39;
+	 * - &#39;instagram&#39;
 	 *
 	 * Pass `false` to skip auto-linking of hashtags.
 	 */
@@ -191,14 +201,48 @@ Autolinker.prototype = {
 	stripPrefix : true,
 
 <span id='Autolinker-cfg-truncate'>	/**
-</span>	 * @cfg {Number} truncate
+</span>	 * @cfg {Number/Object} truncate
 	 *
-	 * A number for how many characters long matched text should be truncated to inside the text of
-	 * a link. If the matched text is over this number of characters, it will be truncated to this length by
-	 * adding a two period ellipsis (&#39;..&#39;) to the end of the string.
+	 * ## Number Form
 	 *
-	 * For example: A url like &#39;http://www.yahoo.com/some/long/path/to/a/file&#39; truncated to 25 characters might look
-	 * something like this: &#39;yahoo.com/some/long/pat..&#39;
+	 * A number for how many characters matched text should be truncated to
+	 * inside the text of a link. If the matched text is over this number of
+	 * characters, it will be truncated to this length by adding a two period
+	 * ellipsis (&#39;..&#39;) to the end of the string.
+	 *
+	 * For example: A url like &#39;http://www.yahoo.com/some/long/path/to/a/file&#39;
+	 * truncated to 25 characters might look something like this:
+	 * &#39;yahoo.com/some/long/pat..&#39;
+	 *
+	 * Example Usage:
+	 *
+	 *     truncate: 25
+	 *
+	 *
+	 * ## Object Form
+	 *
+	 * An Object may also be provided with two properties: `length` (Number) and
+	 * `location` (String). `location` may be one of the following: &#39;end&#39;
+	 * (default), &#39;middle&#39;, or &#39;smart&#39;.
+	 *
+	 * Example Usage:
+	 *
+	 *     truncate: { length: 25, location: &#39;middle&#39; }
+	 *
+	 * @cfg {Number} truncate.length How many characters to allow before
+	 *   truncation will occur.
+	 * @cfg {&quot;end&quot;/&quot;middle&quot;/&quot;smart&quot;} [truncate.location=&quot;end&quot;]
+	 *
+	 * - &#39;end&#39; (default): will truncate up to the number of characters, and then
+	 *   add an ellipsis at the end. Ex: &#39;yahoo.com/some/long/pat..&#39;
+	 * - &#39;middle&#39;: will truncate and add the ellipsis in the middle. Ex:
+	 *   &#39;yahoo.com/s..th/to/a/file&#39;
+	 * - &#39;smart&#39;: for URLs where the algorithm attempts to strip out unnecessary
+	 *   parts first (such as the &#39;www.&#39;, then URL scheme, hash, etc.),
+	 *   attempting to still make the URL human-readable before trying to find a
+	 *   good point to insert the ellipsis if it is still too long. Ex:
+	 *   &#39;yahoo.com/some..to/a/file&#39;. For more details, see
+	 *   {@link Autolinker.truncate.TruncateSmart}.
 	 */
 	truncate : undefined,
 
@@ -489,6 +533,7 @@ Autolinker.link = function( textOrHtml, options ) {
 Autolinker.match = {};
 Autolinker.htmlParser = {};
 Autolinker.matchParser = {};
+Autolinker.truncate = {};
 </pre>
 </body>
 </html>

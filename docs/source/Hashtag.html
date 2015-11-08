@@ -76,6 +76,8 @@ Autolinker.match.Hashtag = Autolinker.Util.extend( Autolinker.match.Match, {
 				return &#39;https://twitter.com/hashtag/&#39; + hashtag;
 			case &#39;facebook&#39; :
 				return &#39;https://www.facebook.com/hashtag/&#39; + hashtag;
+			case &#39;instagram&#39; :
+				return &#39;https://instagram.com/explore/tags/&#39; + hashtag;
 
 			default :  // Shouldn&#39;t happen because Autolinker&#39;s constructor should block any invalid values, but just in case.
 				throw new Error( &#39;Unknown service name to point hashtag to: &#39;, serviceName );
@@ -92,6 +94,7 @@ Autolinker.match.Hashtag = Autolinker.Util.extend( Autolinker.match.Match, {
 		return &#39;#&#39; + this.hashtag;
 	}
 
-} );</pre>
+} );
+</pre>
 </body>
 </html>

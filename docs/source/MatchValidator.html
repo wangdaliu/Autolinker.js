@@ -57,7 +57,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * @private
 	 * @property {RegExp} hasFullProtocolRegex
 	 */
-	hasFullProtocolRegex : /^[A-Za-z][-.+A-Za-z0-9]+:\/\//,
+	hasFullProtocolRegex : /^[A-Za-z][-.+A-Za-z0-9]*:\/\//,
 
 <span id='Autolinker-MatchValidator-property-uriSchemeRegex'>	/**
 </span>	 * Regex to find the URI scheme, such as &#39;mailto:&#39;.
@@ -67,7 +67,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 * @private
 	 * @property {RegExp} uriSchemeRegex
 	 */
-	uriSchemeRegex : /^[A-Za-z][-.+A-Za-z0-9]+:/,
+	uriSchemeRegex : /^[A-Za-z][-.+A-Za-z0-9]*:/,
 
 <span id='Autolinker-MatchValidator-property-hasWordCharAfterProtocolRegex'>	/**
 </span>	 * Regex to determine if at least one word char exists after the protocol (i.e. after the &#39;:&#39;)
@@ -207,6 +207,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 		return ( !!protocolRelativeMatch &amp;&amp; this.invalidProtocolRelMatchRegex.test( protocolRelativeMatch ) );
 	}
 
-} );</pre>
+} );
+</pre>
 </body>
 </html>
