@@ -61,6 +61,25 @@ Autolinker.Util = {
 	},
 
 
+<span id='Autolinker-Util-method-defaults'>	/**
+</span>	 * Assigns (shallow copies) the properties of `src` onto `dest`, if the
+	 * corresponding property on `dest` === `undefined`.
+	 *
+	 * @param {Object} dest The destination object.
+	 * @param {Object} src The source object.
+	 * @return {Object} The destination object (`dest`)
+	 */
+	defaults : function( dest, src ) {
+		for( var prop in src ) {
+			if( src.hasOwnProperty( prop ) &amp;&amp; dest[ prop ] === undefined ) {
+				dest[ prop ] = src[ prop ];
+			}
+		}
+
+		return dest;
+	},
+
+
 <span id='Autolinker-Util-method-extend'>	/**
 </span>	 * Extends `superclass` to create a new subclass, adding the `protoProps` to the new subclass&#39;s prototype.
 	 *

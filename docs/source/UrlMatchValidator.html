@@ -17,41 +17,23 @@
 <body onload="prettyPrint(); highlight();">
   <pre class="prettyprint lang-js">/*global Autolinker */
 /*jshint scripturl:true */
-<span id='Autolinker-MatchValidator'>/**
+<span id='Autolinker-matcher-UrlMatchValidator'>/**
 </span> * @private
- * @class Autolinker.MatchValidator
- * @extends Object
+ * @class Autolinker.matcher.UrlMatchValidator
+ * @singleton
  *
- * Used by Autolinker to filter out false positives from the
- * {@link Autolinker.matchParser.MatchParser#matcherRegex}.
+ * Used by Autolinker to filter out false URL positives from the
+ * {@link Autolinker.matcher.Url UrlMatcher}.
  *
  * Due to the limitations of regular expressions (including the missing feature
  * of look-behinds in JS regular expressions), we cannot always determine the
  * validity of a given match. This class applies a bit of additional logic to
  * filter out any false positives that have been matched by the
- * {@link Autolinker.matchParser.MatchParser#matcherRegex}.
+ * {@link Autolinker.matcher.Url UrlMatcher}.
  */
-Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
+Autolinker.matcher.UrlMatchValidator = {
 
-<span id='Autolinker-MatchValidator-property-invalidProtocolRelMatchRegex'>	/**
-</span>	 * @private
-	 * @property {RegExp} invalidProtocolRelMatchRegex
-	 *
-	 * The regular expression used to check a potential protocol-relative URL
-	 * match, coming from the {@link Autolinker.matchParser.MatchParser#matcherRegex}.
-	 * A protocol-relative URL is, for example, &quot;//yahoo.com&quot;
-	 *
-	 * This regular expression checks to see if there is a word character before
-	 * the &#39;//&#39; match in order to determine if we should actually autolink a
-	 * protocol-relative URL. This is needed because there is no negative
-	 * look-behind in JavaScript regular expressions.
-	 *
-	 * For instance, we want to autolink something like &quot;Go to: //google.com&quot;,
-	 * but we don&#39;t want to autolink something like &quot;abc//google.com&quot;
-	 */
-	invalidProtocolRelMatchRegex : /^[\w]\/\//,
-
-<span id='Autolinker-MatchValidator-property-hasFullProtocolRegex'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-property-hasFullProtocolRegex'>	/**
 </span>	 * Regex to test for a full protocol, with the two trailing slashes. Ex: &#39;http://&#39;
 	 *
 	 * @private
@@ -59,7 +41,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 */
 	hasFullProtocolRegex : /^[A-Za-z][-.+A-Za-z0-9]*:\/\//,
 
-<span id='Autolinker-MatchValidator-property-uriSchemeRegex'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-property-uriSchemeRegex'>	/**
 </span>	 * Regex to find the URI scheme, such as &#39;mailto:&#39;.
 	 *
 	 * This is used to filter out &#39;javascript:&#39; and &#39;vbscript:&#39; schemes.
@@ -69,17 +51,17 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 */
 	uriSchemeRegex : /^[A-Za-z][-.+A-Za-z0-9]*:/,
 
-<span id='Autolinker-MatchValidator-property-hasWordCharAfterProtocolRegex'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-property-hasWordCharAfterProtocolRegex'>	/**
 </span>	 * Regex to determine if at least one word char exists after the protocol (i.e. after the &#39;:&#39;)
 	 *
 	 * @private
 	 * @property {RegExp} hasWordCharAfterProtocolRegex
 	 */
-	hasWordCharAfterProtocolRegex : /:[^\s]*?[A-Za-z]/,
+	hasWordCharAfterProtocolRegex : /:[^\s]*?[A-Za-z\u00C0-\u017F]/,
 
 
-<span id='Autolinker-MatchValidator-method-isValidMatch'>	/**
-</span>	 * Determines if a given match found by the {@link Autolinker.matchParser.MatchParser}
+<span id='Autolinker-matcher-UrlMatchValidator-method-isValid'>	/**
+</span>	 * Determines if a given URL match found by the {@link Autolinker.matcher.Url UrlMatcher}
 	 * is valid. Will return `false` for:
 	 *
 	 * 1) URL matches which do not have at least have one period (&#39;.&#39;) in the
@@ -99,20 +81,15 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	 *   match. Ex: &#39;http://yahoo.com&#39;. This is used to match something like
 	 *   &#39;http://localhost&#39;, where we won&#39;t double check that the domain name
 	 *   has at least one &#39;.&#39; in it.
-	 * @param {String} protocolRelativeMatch The protocol-relative string for a
-	 *   URL match (i.e. &#39;//&#39;), possibly with a preceding character (ex, a
-	 *   space, such as: &#39; //&#39;, or a letter, such as: &#39;a//&#39;). The match is
-	 *   invalid if there is a word character preceding the &#39;//&#39;.
 	 * @return {Boolean} `true` if the match given is valid and should be
 	 *   processed, or `false` if the match is invalid and/or should just not be
 	 *   processed.
 	 */
-	isValidMatch : function( urlMatch, protocolUrlMatch, protocolRelativeMatch ) {
+	isValid : function( urlMatch, protocolUrlMatch ) {
 		if(
 			( protocolUrlMatch &amp;&amp; !this.isValidUriScheme( protocolUrlMatch ) ) ||
-			this.urlMatchDoesNotHaveProtocolOrDot( urlMatch, protocolUrlMatch ) ||       // At least one period (&#39;.&#39;) must exist in the URL match for us to consider it an actual URL, *unless* it was a full protocol match (like &#39;http://localhost&#39;)
-			this.urlMatchDoesNotHaveAtLeastOneWordChar( urlMatch, protocolUrlMatch ) ||  // At least one letter character must exist in the domain name after a protocol match. Ex: skip over something like &quot;git:1.0&quot;
-			this.isInvalidProtocolRelativeMatch( protocolRelativeMatch )                 // A protocol-relative match which has a word character in front of it (so we can skip something like &quot;abc//google.com&quot;)
+			this.urlMatchDoesNotHaveProtocolOrDot( urlMatch, protocolUrlMatch ) ||    // At least one period (&#39;.&#39;) must exist in the URL match for us to consider it an actual URL, *unless* it was a full protocol match (like &#39;http://localhost&#39;)
+			this.urlMatchDoesNotHaveAtLeastOneWordChar( urlMatch, protocolUrlMatch )  // At least one letter character must exist in the domain name after a protocol match. Ex: skip over something like &quot;git:1.0&quot;
 		) {
 			return false;
 		}
@@ -121,7 +98,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	},
 
 
-<span id='Autolinker-MatchValidator-method-isValidUriScheme'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-method-isValidUriScheme'>	/**
 </span>	 * Determines if the URI scheme is a valid scheme to be autolinked. Returns
 	 * `false` if the scheme is &#39;javascript:&#39; or &#39;vbscript:&#39;
 	 *
@@ -137,7 +114,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	},
 
 
-<span id='Autolinker-MatchValidator-method-urlMatchDoesNotHaveProtocolOrDot'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-method-urlMatchDoesNotHaveProtocolOrDot'>	/**
 </span>	 * Determines if a URL match does not have either:
 	 *
 	 * a) a full protocol (i.e. &#39;http://&#39;), or
@@ -163,7 +140,7 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 	},
 
 
-<span id='Autolinker-MatchValidator-method-urlMatchDoesNotHaveAtLeastOneWordChar'>	/**
+<span id='Autolinker-matcher-UrlMatchValidator-method-urlMatchDoesNotHaveAtLeastOneWordChar'>	/**
 </span>	 * Determines if a URL match does not have at least one word character after
 	 * the protocol (i.e. in the domain name).
 	 *
@@ -186,28 +163,8 @@ Autolinker.MatchValidator = Autolinker.Util.extend( Object, {
 		} else {
 			return false;
 		}
-	},
-
-
-<span id='Autolinker-MatchValidator-method-isInvalidProtocolRelativeMatch'>	/**
-</span>	 * Determines if a protocol-relative match is an invalid one. This method
-	 * returns `true` if there is a `protocolRelativeMatch`, and that match
-	 * contains a word character before the &#39;//&#39; (i.e. it must contain
-	 * whitespace or nothing before the &#39;//&#39; in order to be considered valid).
-	 *
-	 * @private
-	 * @param {String} protocolRelativeMatch The protocol-relative string for a
-	 *   URL match (i.e. &#39;//&#39;), possibly with a preceding character (ex, a
-	 *   space, such as: &#39; //&#39;, or a letter, such as: &#39;a//&#39;). The match is
-	 *   invalid if there is a word character preceding the &#39;//&#39;.
-	 * @return {Boolean} `true` if it is an invalid protocol-relative match,
-	 *   `false` otherwise.
-	 */
-	isInvalidProtocolRelativeMatch : function( protocolRelativeMatch ) {
-		return ( !!protocolRelativeMatch &amp;&amp; this.invalidProtocolRelMatchRegex.test( protocolRelativeMatch ) );
 	}
 
-} );
-</pre>
+};</pre>
 </body>
 </html>

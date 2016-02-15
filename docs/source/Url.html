@@ -19,116 +19,180 @@
 <span id='Autolinker-match-Url'>/**
 </span> * @class Autolinker.match.Url
  * @extends Autolinker.match.Match
- * 
+ *
  * Represents a Url match found in an input string which should be Autolinked.
- * 
+ *
  * See this class&#39;s superclass ({@link Autolinker.match.Match}) for more details.
  */
 Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
-	
-<span id='Autolinker-match-Url-cfg-url'>	/**
-</span>	 * @cfg {String} url (required)
-	 * 
+
+<span id='Autolinker-match-Url-property-url'>	/**
+</span>	 * @protected
+	 * @property {String} url
+	 *
 	 * The url that was matched.
 	 */
-	
-<span id='Autolinker-match-Url-cfg-protocolUrlMatch'>	/**
-</span>	 * @cfg {Boolean} protocolUrlMatch (required)
-	 * 
-	 * `true` if the URL is a match which already has a protocol (i.e. &#39;http://&#39;), `false` if the match was from a &#39;www&#39; or
-	 * known TLD match.
+
+<span id='Autolinker-match-Url-property-urlMatchType'>	/**
+</span>	 * @protected
+	 * @property  {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;} urlMatchType
+	 *
+	 * The type of URL match that this class represents. This helps to determine
+	 * if the match was made in the original text with a prefixed scheme (ex:
+	 * &#39;http://www.google.com&#39;), a prefixed &#39;www&#39; (ex: &#39;www.google.com&#39;), or
+	 * was matched by a known top-level domain (ex: &#39;google.com&#39;).
 	 */
-	
-<span id='Autolinker-match-Url-cfg-protocolRelativeMatch'>	/**
-</span>	 * @cfg {Boolean} protocolRelativeMatch (required)
-	 * 
-	 * `true` if the URL is a protocol-relative match. A protocol-relative match is a URL that starts with &#39;//&#39;,
-	 * and will be either http:// or https:// based on the protocol that the site is loaded under.
+
+<span id='Autolinker-match-Url-property-protocolUrlMatch'>	/**
+</span>	 * @protected
+	 * @property  {Boolean} protocolUrlMatch
+	 *
+	 * `true` if the URL is a match which already has a protocol (i.e.
+	 * &#39;http://&#39;), `false` if the match was from a &#39;www&#39; or known TLD match.
 	 */
-	
-<span id='Autolinker-match-Url-cfg-stripPrefix'>	/**
-</span>	 * @cfg {Boolean} stripPrefix (required)
-	 * @inheritdoc Autolinker#stripPrefix
+
+<span id='Autolinker-match-Url-property-protocolRelativeMatch'>	/**
+</span>	 * @protected
+	 * @property  {Boolean} protocolRelativeMatch
+	 *
+	 * `true` if the URL is a protocol-relative match. A protocol-relative match
+	 * is a URL that starts with &#39;//&#39;, and will be either http:// or https://
+	 * based on the protocol that the site is loaded under.
 	 */
-	
+
+<span id='Autolinker-match-Url-property-stripPrefix'>	/**
+</span>	 * @protected
+	 * @property {Boolean} stripPrefix
+	 * @inheritdoc Autolinker#cfg-stripPrefix
+	 */
+
+
+<span id='Autolinker-match-Url-method-constructor'>	/**
+</span>	 * @constructor
+	 * @param {String} matchedText The original text that was matched.
+	 * @param {Number} offset The offset of where the match was made in the
+	 *   input string.
+	 * @param {String} url The url that was matched.
+	 * @param {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;} urlMatchType The type of URL match that
+	 *   this class represents. See {@link #urlMatchType} for details.
+	 * @param {Boolean} protocolUrlMatch `true` if the URL is a match which
+	 *   already has a protocol. See {@link #protocolUrlMatch} for details.
+	 * @param {Boolean} protocolRelativeMatch `true` if the URL is a protocol-
+	 *   relative match. See {@link #protocolRelativeMatch} for details.
+	 * @param {Boolean} stripPrefix
+	 */
+	constructor : function( matchedText, offset, url, urlMatchType, protocolUrlMatch, protocolRelativeMatch, stripPrefix ) {
+		Autolinker.match.Match.prototype.constructor.call( this, matchedText, offset );
+
+		// @if DEBUG
+		if( urlMatchType !== &#39;scheme&#39; &amp;&amp; urlMatchType !== &#39;www&#39; &amp;&amp; urlMatchType !== &#39;tld&#39; ) throw new Error( &#39;`urlMatchType` must be one of: &quot;scheme&quot;, &quot;www&quot;, or &quot;tld&quot;&#39; );
+		if( !url ) throw new Error( &#39;`url` arg required&#39; );
+		if( protocolUrlMatch == null ) throw new Error( &#39;`protocolUrlMatch` arg required&#39; );
+		if( protocolRelativeMatch == null ) throw new Error( &#39;`protocolRelativeMatch` arg required&#39; );
+		if( stripPrefix == null ) throw new Error( &#39;`stripPrefix` arg required&#39; );
+		// @endif
+
+		this.urlMatchType = urlMatchType;
+		this.url = url;
+		this.protocolUrlMatch = protocolUrlMatch;
+		this.protocolRelativeMatch = protocolRelativeMatch;
+		this.stripPrefix = stripPrefix;
+	},
+
 
 <span id='Autolinker-match-Url-property-urlPrefixRegex'>	/**
 </span>	 * @private
 	 * @property {RegExp} urlPrefixRegex
-	 * 
+	 *
 	 * A regular expression used to remove the &#39;http://&#39; or &#39;https://&#39; and/or the &#39;www.&#39; from URLs.
 	 */
 	urlPrefixRegex: /^(https?:\/\/)?(www\.)?/i,
-	
+
 <span id='Autolinker-match-Url-property-protocolRelativeRegex'>	/**
 </span>	 * @private
 	 * @property {RegExp} protocolRelativeRegex
-	 * 
+	 *
 	 * The regular expression used to remove the protocol-relative &#39;//&#39; from the {@link #url} string, for purposes
 	 * of {@link #getAnchorText}. A protocol-relative URL is, for example, &quot;//yahoo.com&quot;
 	 */
 	protocolRelativeRegex : /^\/\//,
-	
+
 <span id='Autolinker-match-Url-property-protocolPrepended'>	/**
 </span>	 * @private
 	 * @property {Boolean} protocolPrepended
-	 * 
+	 *
 	 * Will be set to `true` if the &#39;http://&#39; protocol has been prepended to the {@link #url} (because the
 	 * {@link #url} did not have a protocol)
 	 */
 	protocolPrepended : false,
-	
+
 
 <span id='Autolinker-match-Url-method-getType'>	/**
 </span>	 * Returns a string name for the type of match that this class represents.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getType : function() {
 		return &#39;url&#39;;
 	},
-	
-	
+
+
+<span id='Autolinker-match-Url-method-getUrlMatchType'>	/**
+</span>	 * Returns a string name for the type of URL match that this class
+	 * represents.
+	 *
+	 * This helps to determine if the match was made in the original text with a
+	 * prefixed scheme (ex: &#39;http://www.google.com&#39;), a prefixed &#39;www&#39; (ex:
+	 * &#39;www.google.com&#39;), or was matched by a known top-level domain (ex:
+	 * &#39;google.com&#39;).
+	 *
+	 * @return {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;}
+	 */
+	getUrlMatchType : function() {
+		return this.urlMatchType;
+	},
+
+
 <span id='Autolinker-match-Url-method-getUrl'>	/**
 </span>	 * Returns the url that was matched, assuming the protocol to be &#39;http://&#39; if the original
 	 * match was missing a protocol.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getUrl : function() {
 		var url = this.url;
-		
+
 		// if the url string doesn&#39;t begin with a protocol, assume &#39;http://&#39;
 		if( !this.protocolRelativeMatch &amp;&amp; !this.protocolUrlMatch &amp;&amp; !this.protocolPrepended ) {
 			url = this.url = &#39;http://&#39; + url;
-			
+
 			this.protocolPrepended = true;
 		}
-		
+
 		return url;
 	},
-	
+
 
 <span id='Autolinker-match-Url-method-getAnchorHref'>	/**
 </span>	 * Returns the anchor href that should be generated for the match.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getAnchorHref : function() {
 		var url = this.getUrl();
-		
-		return url.replace( /&amp;amp;/g, &#39;&amp;&#39; );  // any &amp;amp;&#39;s in the URL should be converted back to &#39;&amp;&#39; if they were displayed as &amp;amp; in the source html 
+
+		return url.replace( /&amp;amp;/g, &#39;&amp;&#39; );  // any &amp;amp;&#39;s in the URL should be converted back to &#39;&amp;&#39; if they were displayed as &amp;amp; in the source html
 	},
-	
-	
+
+
 <span id='Autolinker-match-Url-method-getAnchorText'>	/**
 </span>	 * Returns the anchor text that should be generated for the match.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getAnchorText : function() {
-		var anchorText = this.getUrl();
-		
+		var anchorText = this.getMatchedText();
+
 		if( this.protocolRelativeMatch ) {
 			// Strip off any protocol-relative &#39;//&#39; from the anchor text
 			anchorText = this.stripProtocolRelativePrefix( anchorText );
@@ -137,18 +201,18 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 			anchorText = this.stripUrlPrefix( anchorText );
 		}
 		anchorText = this.removeTrailingSlash( anchorText );  // remove trailing slash, if there is one
-		
+
 		return anchorText;
 	},
-	
-	
+
+
 	// ---------------------------------------
-	
+
 	// Utility Functionality
-	
+
 <span id='Autolinker-match-Url-method-stripUrlPrefix'>	/**
 </span>	 * Strips the URL prefix (such as &quot;http://&quot; or &quot;https://&quot;) from the given text.
-	 * 
+	 *
 	 * @private
 	 * @param {String} text The text of the anchor that is being generated, for which to strip off the
 	 *   url prefix (such as stripping off &quot;http://&quot;)
@@ -157,11 +221,11 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	stripUrlPrefix : function( text ) {
 		return text.replace( this.urlPrefixRegex, &#39;&#39; );
 	},
-	
-	
+
+
 <span id='Autolinker-match-Url-method-stripProtocolRelativePrefix'>	/**
 </span>	 * Strips any protocol-relative &#39;//&#39; from the anchor text.
-	 * 
+	 *
 	 * @private
 	 * @param {String} text The text of the anchor that is being generated, for which to strip off the
 	 *   protocol-relative prefix (such as stripping off &quot;//&quot;)
@@ -170,11 +234,11 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	stripProtocolRelativePrefix : function( text ) {
 		return text.replace( this.protocolRelativeRegex, &#39;&#39; );
 	},
-	
-	
+
+
 <span id='Autolinker-match-Url-method-removeTrailingSlash'>	/**
 </span>	 * Removes any trailing slash from the given `anchorText`, in preparation for the text to be displayed.
-	 * 
+	 *
 	 * @private
 	 * @param {String} anchorText The text of the anchor that is being generated, for which to remove any trailing
 	 *   slash (&#39;/&#39;) that may exist.
@@ -186,7 +250,7 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 		}
 		return anchorText;
 	}
-	
+
 } );</pre>
 </body>
 </html>

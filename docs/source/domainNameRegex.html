@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*global Autolinker */
+<span id='Autolinker-matcher-property-domainNameRegex'>/**
+</span> * @member Autolinker.matcher
+ * @property {RegExp} domainNameRegex
+ *
+ * A regular expression to match domain names of a URL or email address. Ex:
+ * &#39;google&#39;, &#39;yahoo&#39;, &#39;some-other-company&#39;, etc.
+ *
+ * This is shared by {@link Autolinker.matcher.Url} and {@link Autolinker.matcher.Email},
+ * and thus needed to exist as a seperate entity.
+ */
+Autolinker.matcher.domainNameRegex = /[A-Za-z0-9\u00C0-\u017F\.\-]*[A-Za-z0-9\u00C0-\u017F\-]/;  // anything looking at all like a domain, not ending in a period.
+</pre>
+</body>
+</html>

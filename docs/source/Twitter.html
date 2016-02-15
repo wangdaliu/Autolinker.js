@@ -19,59 +19,79 @@
 <span id='Autolinker-match-Twitter'>/**
 </span> * @class Autolinker.match.Twitter
  * @extends Autolinker.match.Match
- * 
+ *
  * Represents a Twitter match found in an input string which should be Autolinked.
- * 
+ *
  * See this class&#39;s superclass ({@link Autolinker.match.Match}) for more details.
  */
 Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
-	
-<span id='Autolinker-match-Twitter-cfg-twitterHandle'>	/**
-</span>	 * @cfg {String} twitterHandle (required)
-	 * 
-	 * The Twitter handle that was matched.
+
+<span id='Autolinker-match-Twitter-property-twitterHandle'>	/**
+</span>	 * @protected
+	 * @property {String} twitterHandle (required)
+	 *
+	 * The Twitter handle that was matched, without the &#39;@&#39; character.
 	 */
-	
+
+
+<span id='Autolinker-match-Twitter-method-constructor'>	/**
+</span>	 * @constructor
+	 * @param {String} matchedText The original text that was matched.
+	 * @param {Number} offset The offset of where the match was made in the
+	 *   input string.
+	 * @param {String} twitterHandle The Twitter handle that was matched,
+	 *   without the &#39;@&#39; character.
+	 */
+	constructor : function( matchedText, offset, twitterHandle ) {
+		Autolinker.match.Match.prototype.constructor.call( this, matchedText, offset );
+
+		// @if DEBUG
+		if( !twitterHandle ) throw new Error( &#39;`twitterHandle` arg required&#39; );
+		// @endif
+
+		this.twitterHandle = twitterHandle;
+	},
+
 
 <span id='Autolinker-match-Twitter-method-getType'>	/**
 </span>	 * Returns the type of match that this class represents.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getType : function() {
 		return &#39;twitter&#39;;
 	},
-	
-	
+
+
 <span id='Autolinker-match-Twitter-method-getTwitterHandle'>	/**
-</span>	 * Returns a string name for the type of match that this class represents.
-	 * 
+</span>	 * Returns the twitter handle, without the &#39;@&#39; character.
+	 *
 	 * @return {String}
 	 */
 	getTwitterHandle : function() {
 		return this.twitterHandle;
 	},
-	
+
 
 <span id='Autolinker-match-Twitter-method-getAnchorHref'>	/**
 </span>	 * Returns the anchor href that should be generated for the match.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getAnchorHref : function() {
 		return &#39;https://twitter.com/&#39; + this.twitterHandle;
 	},
-	
-	
+
+
 <span id='Autolinker-match-Twitter-method-getAnchorText'>	/**
 </span>	 * Returns the anchor text that should be generated for the match.
-	 * 
+	 *
 	 * @return {String}
 	 */
 	getAnchorText : function() {
 		return &#39;@&#39; + this.twitterHandle;
 	}
-	
+
 } );</pre>
 </body>
 </html>
