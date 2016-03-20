@@ -26,16 +26,14 @@
  */
 Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 
-<span id='Autolinker-match-Url-property-url'>	/**
-</span>	 * @protected
-	 * @property {String} url
+<span id='Autolinker-match-Url-cfg-url'>	/**
+</span>	 * @cfg {String} url (required)
 	 *
 	 * The url that was matched.
 	 */
 
-<span id='Autolinker-match-Url-property-urlMatchType'>	/**
-</span>	 * @protected
-	 * @property  {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;} urlMatchType
+<span id='Autolinker-match-Url-cfg-urlMatchType'>	/**
+</span>	 * @cfg {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;} urlMatchType (required)
 	 *
 	 * The type of URL match that this class represents. This helps to determine
 	 * if the match was made in the original text with a prefixed scheme (ex:
@@ -43,60 +41,48 @@ Autolinker.match.Url = Autolinker.Util.extend( Autolinker.match.Match, {
 	 * was matched by a known top-level domain (ex: &#39;google.com&#39;).
 	 */
 
-<span id='Autolinker-match-Url-property-protocolUrlMatch'>	/**
-</span>	 * @protected
-	 * @property  {Boolean} protocolUrlMatch
+<span id='Autolinker-match-Url-cfg-protocolUrlMatch'>	/**
+</span>	 * @cfg {Boolean} protocolUrlMatch (required)
 	 *
 	 * `true` if the URL is a match which already has a protocol (i.e.
 	 * &#39;http://&#39;), `false` if the match was from a &#39;www&#39; or known TLD match.
 	 */
 
-<span id='Autolinker-match-Url-property-protocolRelativeMatch'>	/**
-</span>	 * @protected
-	 * @property  {Boolean} protocolRelativeMatch
+<span id='Autolinker-match-Url-cfg-protocolRelativeMatch'>	/**
+</span>	 * @cfg {Boolean} protocolRelativeMatch (required)
 	 *
 	 * `true` if the URL is a protocol-relative match. A protocol-relative match
 	 * is a URL that starts with &#39;//&#39;, and will be either http:// or https://
 	 * based on the protocol that the site is loaded under.
 	 */
 
-<span id='Autolinker-match-Url-property-stripPrefix'>	/**
-</span>	 * @protected
-	 * @property {Boolean} stripPrefix
+<span id='Autolinker-match-Url-cfg-stripPrefix'>	/**
+</span>	 * @cfg {Boolean} stripPrefix (required)
 	 * @inheritdoc Autolinker#cfg-stripPrefix
 	 */
 
 
 <span id='Autolinker-match-Url-method-constructor'>	/**
 </span>	 * @constructor
-	 * @param {String} matchedText The original text that was matched.
-	 * @param {Number} offset The offset of where the match was made in the
-	 *   input string.
-	 * @param {String} url The url that was matched.
-	 * @param {&quot;scheme&quot;/&quot;www&quot;/&quot;tld&quot;} urlMatchType The type of URL match that
-	 *   this class represents. See {@link #urlMatchType} for details.
-	 * @param {Boolean} protocolUrlMatch `true` if the URL is a match which
-	 *   already has a protocol. See {@link #protocolUrlMatch} for details.
-	 * @param {Boolean} protocolRelativeMatch `true` if the URL is a protocol-
-	 *   relative match. See {@link #protocolRelativeMatch} for details.
-	 * @param {Boolean} stripPrefix
+	 * @param {Object} cfg The configuration properties for the Match
+	 *   instance, specified in an Object (map).
 	 */
-	constructor : function( matchedText, offset, url, urlMatchType, protocolUrlMatch, protocolRelativeMatch, stripPrefix ) {
-		Autolinker.match.Match.prototype.constructor.call( this, matchedText, offset );
+	constructor : function( cfg ) {
+		Autolinker.match.Match.prototype.constructor.call( this, cfg );
 
 		// @if DEBUG
-		if( urlMatchType !== &#39;scheme&#39; &amp;&amp; urlMatchType !== &#39;www&#39; &amp;&amp; urlMatchType !== &#39;tld&#39; ) throw new Error( &#39;`urlMatchType` must be one of: &quot;scheme&quot;, &quot;www&quot;, or &quot;tld&quot;&#39; );
-		if( !url ) throw new Error( &#39;`url` arg required&#39; );
-		if( protocolUrlMatch == null ) throw new Error( &#39;`protocolUrlMatch` arg required&#39; );
-		if( protocolRelativeMatch == null ) throw new Error( &#39;`protocolRelativeMatch` arg required&#39; );
-		if( stripPrefix == null ) throw new Error( &#39;`stripPrefix` arg required&#39; );
+		if( cfg.urlMatchType !== &#39;scheme&#39; &amp;&amp; cfg.urlMatchType !== &#39;www&#39; &amp;&amp; cfg.urlMatchType !== &#39;tld&#39; ) throw new Error( &#39;`urlMatchType` cfg must be one of: &quot;scheme&quot;, &quot;www&quot;, or &quot;tld&quot;&#39; );
+		if( !cfg.url ) throw new Error( &#39;`url` cfg required&#39; );
+		if( cfg.protocolUrlMatch == null ) throw new Error( &#39;`protocolUrlMatch` cfg required&#39; );
+		if( cfg.protocolRelativeMatch == null ) throw new Error( &#39;`protocolRelativeMatch` cfg required&#39; );
+		if( cfg.stripPrefix == null ) throw new Error( &#39;`stripPrefix` cfg required&#39; );
 		// @endif
 
-		this.urlMatchType = urlMatchType;
-		this.url = url;
-		this.protocolUrlMatch = protocolUrlMatch;
-		this.protocolRelativeMatch = protocolRelativeMatch;
-		this.stripPrefix = stripPrefix;
+		this.urlMatchType = cfg.urlMatchType;
+		this.url = cfg.url;
+		this.protocolUrlMatch = cfg.protocolUrlMatch;
+		this.protocolRelativeMatch = cfg.protocolRelativeMatch;
+		this.stripPrefix = cfg.stripPrefix;
 	},
 
 

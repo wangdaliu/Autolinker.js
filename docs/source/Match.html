@@ -49,31 +49,41 @@
  */
 Autolinker.match.Match = Autolinker.Util.extend( Object, {
 
-<span id='Autolinker-match-Match-property-matchedText'>	/**
-</span>	 * @protected
-	 * @property {String} matchedText
+<span id='Autolinker-match-Match-cfg-tagBuilder'>	/**
+</span>	 * @cfg {Autolinker.AnchorTagBuilder} tagBuilder (required)
+	 *
+	 * Reference to the AnchorTagBuilder instance to use to generate an anchor
+	 * tag for the Match.
 	 */
 
-<span id='Autolinker-match-Match-property-offset'>	/**
-</span>	 * @protected
-	 * @property {Number} offset
+<span id='Autolinker-match-Match-cfg-matchedText'>	/**
+</span>	 * @cfg {String} matchedText (required)
+	 *
+	 * The original text that was matched by the {@link Autolinker.matcher.Matcher}.
+	 */
+
+<span id='Autolinker-match-Match-cfg-offset'>	/**
+</span>	 * @cfg {Number} offset (required)
+	 *
+	 * The offset of where the match was made in the input string.
 	 */
 
 
 <span id='Autolinker-match-Match-method-constructor'>	/**
 </span>	 * @constructor
-	 * @param {String} matchedText The original text that was matched.
-	 * @param {Number} offset The offset of where the match was made in the
-	 *   input string.
+	 * @param {Object} cfg The configuration properties for the Match
+	 *   instance, specified in an Object (map).
 	 */
-	constructor : function( matchedText, offset ) {
+	constructor : function( cfg ) {
 		// @if DEBUG
-		if( matchedText == null ) throw new Error( &#39;`matchedText` arg required&#39; );
-		if( offset == null ) throw new Error( &#39;`offset` arg required&#39; );
+		if( cfg.tagBuilder == null ) throw new Error( &#39;`tagBuilder` cfg required&#39; );
+		if( cfg.matchedText == null ) throw new Error( &#39;`matchedText` cfg required&#39; );
+		if( cfg.offset == null ) throw new Error( &#39;`offset` cfg required&#39; );
 		// @endif
 
-		this.matchedText = matchedText;
-		this.offset = offset;
+		this.tagBuilder = cfg.tagBuilder;
+		this.matchedText = cfg.matchedText;
+		this.offset = cfg.offset;
 	},
 
 
@@ -139,7 +149,27 @@ Autolinker.match.Match = Autolinker.Util.extend( Object, {
 	 * @abstract
 	 * @return {String}
 	 */
-	getAnchorText : Autolinker.Util.abstractMethod
+	getAnchorText : Autolinker.Util.abstractMethod,
+
+
+<span id='Autolinker-match-Match-method-buildTag'>	/**
+</span>	 * Builds and returns an {@link Autolinker.HtmlTag} instance based on the
+	 * Match.
+	 *
+	 * This can be used to easily generate anchor tags from matches, and either
+	 * return their HTML string, or modify them before doing so.
+	 *
+	 * Example Usage:
+	 *
+	 *     var tag = match.buildTag();
+	 *     tag.addClass( &#39;cordova-link&#39; );
+	 *     tag.setAttr( &#39;target&#39;, &#39;_system&#39; );
+	 *
+	 *     tag.toAnchorString();  // &lt;a href=&quot;http://google.com&quot; class=&quot;cordova-link&quot; target=&quot;_system&quot;&gt;Google&lt;/a&gt;
+	 */
+	buildTag : function() {
+		return this.tagBuilder.build( this );
+	}
 
 } );</pre>
 </body>

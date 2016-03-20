@@ -432,20 +432,8 @@ Autolinker.prototype = {
 		// And finally, remove matches for match types that have been turned
 		// off. We needed to have all match types turned on initially so that
 		// things like hashtags could be filtered out if they were really just
-		// part of a URL match (as a named anchor).
-		if( !this.hashtag ) matches = matches.filter( function( match ) { return match.getType() !== &#39;hashtag&#39;; } );
-		if( !this.email )   matches = matches.filter( function( match ) { return match.getType() !== &#39;email&#39;; } );
-		if( !this.phone )   matches = matches.filter( function( match ) { return match.getType() !== &#39;phone&#39;; } );
-		if( !this.twitter ) matches = matches.filter( function( match ) { return match.getType() !== &#39;twitter&#39;; } );
-		if( !this.urls.schemeMatches ) {
-			matches = matches.filter( function( m ) { return m.getType() !== &#39;url&#39; || m.getUrlMatchType() !== &#39;scheme&#39;; } );
-		}
-		if( !this.urls.wwwMatches ) {
-			matches = matches.filter( function( m ) { return m.getType() !== &#39;url&#39; || m.getUrlMatchType() !== &#39;www&#39;; } );
-		}
-		if( !this.urls.tldMatches ) {
-			matches = matches.filter( function( m ) { return m.getType() !== &#39;url&#39; || m.getUrlMatchType() !== &#39;tld&#39;; } );
-		}
+		// part of a URL match (for instance, as a named anchor).
+		matches = this.removeUnwantedMatches( matches );
 
 		return matches;
 	},
@@ -472,6 +460,38 @@ Autolinker.prototype = {
 			while( i + 1 &lt; matches.length &amp;&amp; matches[ i + 1 ].getOffset() &lt;= endIdx ) {
 				matches.splice( i + 1, 1 );
 			}
+		}
+
+		return matches;
+	},
+
+
+<span id='Autolinker-method-removeUnwantedMatches'>	/**
+</span>	 * Removes matches for matchers that were turned off in the options. For
+	 * example, if {@link #hashtag hashtags} were not to be matched, we&#39;ll
+	 * remove them from the `matches` array here.
+	 *
+	 * @private
+	 * @param {Autolinker.match.Match[]} matches The array of matches to remove
+	 *   the unwanted matches from. Note: this array is mutated for the
+	 *   removals.
+	 * @return {Autolinker.match.Match[]} The mutated input `matches` array.
+	 */
+	removeUnwantedMatches : function( matches ) {
+		var remove = Autolinker.Util.remove;
+
+		if( !this.hashtag ) remove( matches, function( match ) { return match.getType() === &#39;hashtag&#39;; } );
+		if( !this.email )   remove( matches, function( match ) { return match.getType() === &#39;email&#39;; } );
+		if( !this.phone )   remove( matches, function( match ) { return match.getType() === &#39;phone&#39;; } );
+		if( !this.twitter ) remove( matches, function( match ) { return match.getType() === &#39;twitter&#39;; } );
+		if( !this.urls.schemeMatches ) {
+			remove( matches, function( m ) { return m.getType() === &#39;url&#39; &amp;&amp; m.getUrlMatchType() === &#39;scheme&#39;; } );
+		}
+		if( !this.urls.wwwMatches ) {
+			remove( matches, function( m ) { return m.getType() === &#39;url&#39; &amp;&amp; m.getUrlMatchType() === &#39;www&#39;; } );
+		}
+		if( !this.urls.tldMatches ) {
+			remove( matches, function( m ) { return m.getType() === &#39;url&#39; &amp;&amp; m.getUrlMatchType() === &#39;tld&#39;; } );
 		}
 
 		return matches;
@@ -591,8 +611,7 @@ Autolinker.prototype = {
 
 		} else {  // replaceFnResult === true, or no/unknown return value from function
 			// Perform Autolinker&#39;s default anchor tag generation
-			var tagBuilder = this.getTagBuilder(),
-			    anchorTag = tagBuilder.build( match );  // returns an Autolinker.HtmlTag instance
+			var anchorTag = match.buildTag();  // returns an Autolinker.HtmlTag instance
 
 			return anchorTag.toAnchorString();
 		}
@@ -626,13 +645,15 @@ Autolinker.prototype = {
 	 */
 	getMatchers : function() {
 		if( !this.matchers ) {
-			var matchersNs = Autolinker.matcher;
+			var matchersNs = Autolinker.matcher,
+			    tagBuilder = this.getTagBuilder();
+
 			var matchers = [
-				new matchersNs.Hashtag( { serviceName: this.hashtag } ),
-				new matchersNs.Email(),
-				new matchersNs.Phone(),
-				new matchersNs.Twitter(),
-				new matchersNs.Url( { stripPrefix: this.stripPrefix } )
+				new matchersNs.Hashtag( { tagBuilder: tagBuilder, serviceName: this.hashtag } ),
+				new matchersNs.Email( { tagBuilder: tagBuilder } ),
+				new matchersNs.Phone( { tagBuilder: tagBuilder } ),
+				new matchersNs.Twitter( { tagBuilder: tagBuilder } ),
+				new matchersNs.Url( { tagBuilder: tagBuilder, stripPrefix: this.stripPrefix } )
 			];
 
 			return ( this.matchers = matchers );

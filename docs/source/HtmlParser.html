@@ -86,7 +86,7 @@ Autolinker.htmlParser.HtmlParser = Autolinker.Util.extend( Object, {
 
 							// Zero or more attributes following the tag name
 							&#39;(?:&#39;,
-								&#39;\\s+&#39;,                // one or more whitespace chars before an attribute
+								&#39;\\s*&#39;,                // any number of whitespace chars before an attribute
 								nameEqualsValueRegex,  // attr=&quot;value&quot; (with optional =&quot;value&quot; part)
 							&#39;)*&#39;,
 

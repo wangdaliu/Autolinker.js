@@ -28,17 +28,15 @@
  */
 Autolinker.match.Hashtag = Autolinker.Util.extend( Autolinker.match.Match, {
 
-<span id='Autolinker-match-Hashtag-property-serviceName'>	/**
-</span>	 * @protected
-	 * @property {String} serviceName
+<span id='Autolinker-match-Hashtag-cfg-serviceName'>	/**
+</span>	 * @cfg {String} serviceName
 	 *
 	 * The service to point hashtag matches to. See {@link Autolinker#hashtag}
 	 * for available values.
 	 */
 
-<span id='Autolinker-match-Hashtag-property-hashtag'>	/**
-</span>	 * @protected
-	 * @property {String} hashtag
+<span id='Autolinker-match-Hashtag-cfg-hashtag'>	/**
+</span>	 * @cfg {String} hashtag (required)
 	 *
 	 * The Hashtag that was matched, without the &#39;#&#39;.
 	 */
@@ -46,23 +44,19 @@ Autolinker.match.Hashtag = Autolinker.Util.extend( Autolinker.match.Match, {
 
 <span id='Autolinker-match-Hashtag-method-constructor'>	/**
 </span>	 * @constructor
-	 * @param {String} matchedText The original text that was matched.
-	 * @param {Number} offset The offset of where the match was made in the
-	 *   input string.
-	 * @param {String} serviceName The service to point hashtag matches to. See
-	 *   {@link Autolinker#hashtag} for available values.
-	 * @param {String} hashtag The Hashtag that was matched, without the &#39;#&#39;.
+	 * @param {Object} cfg The configuration properties for the Match
+	 *   instance, specified in an Object (map).
 	 */
-	constructor : function( matchedText, offset, serviceName, hashtag ) {
-		Autolinker.match.Match.prototype.constructor.call( this, matchedText, offset );
+	constructor : function( cfg ) {
+		Autolinker.match.Match.prototype.constructor.call( this, cfg );
 
 		// @if DEBUG
-		// TODO: if( !serviceName ) throw new Error( &#39;`serviceName` arg required&#39; );
-		if( !hashtag ) throw new Error( &#39;`hashtag` arg required&#39; );
+		// TODO: if( !serviceName ) throw new Error( &#39;`serviceName` cfg required&#39; );
+		if( !cfg.hashtag ) throw new Error( &#39;`hashtag` cfg required&#39; );
 		// @endif
 
-		this.serviceName = serviceName;
-		this.hashtag = hashtag;
+		this.serviceName = cfg.serviceName;
+		this.hashtag = cfg.hashtag;
 	},
 
 

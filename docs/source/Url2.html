@@ -69,12 +69,13 @@ Autolinker.matcher.Url = Autolinker.Util.extend( Autolinker.matcher.Matcher, {
 	matcherRegex : (function() {
 		var schemeRegex = /(?:[A-Za-z][-.+A-Za-z0-9]*:(?![A-Za-z][-.+A-Za-z0-9]*:\/\/)(?!\d+\/?)(?:\/\/)?)/,  // match protocol, allow in format &quot;http://&quot; or &quot;mailto:&quot;. However, do not match the first part of something like &#39;link:http://www.google.com&#39; (i.e. don&#39;t match &quot;link:&quot;). Also, make sure we don&#39;t interpret &#39;google.com:8000&#39; as if &#39;google.com&#39; was a protocol here (i.e. ignore a trailing port number in this regex)
 		    wwwRegex = /(?:www\.)/,                  // starting with &#39;www.&#39;
-		    domainNameRegex = Autolinker.matcher.domainNameRegex,
-		    tldRegex = Autolinker.matcher.tldRegex,  // match our known top level domains (TLDs)
+		    domainNameRegex = Autolinker.RegexLib.domainNameRegex,
+		    tldRegex = Autolinker.RegexLib.tldRegex,  // match our known top level domains (TLDs)
+		    alphaNumericCharsStr = Autolinker.RegexLib.alphaNumericCharsStr,
 
 		    // Allow optional path, query string, and hash anchor, not ending in the following characters: &quot;?!:,.;&quot;
 		    // http://blog.codinghorror.com/the-problem-with-urls/
-		    urlSuffixRegex = /[\-A-Za-z0-9\u00C0-\u017F+&amp;@#\/%=~_()|&#39;$*\[\]?!:,.;]*[\-A-Za-z0-9\u00C0-\u017F+&amp;@#\/%=~_()|&#39;$*\[\]]/;
+		    urlSuffixRegex = new RegExp( &#39;[&#39; + alphaNumericCharsStr + &#39;\\-+&amp;@#/%=~_()|\&#39;$*\\[\\]?!:,.;]*[&#39; + alphaNumericCharsStr + &#39;\\-+&amp;@#/%=~_()|\&#39;$*\\[\\]]&#39; );
 
 		return new RegExp( [
 			&#39;(?:&#39;, // parens to cover match for scheme (optional), and domain
@@ -147,18 +148,20 @@ Autolinker.matcher.Url = Autolinker.Util.extend( Autolinker.matcher.Matcher, {
 	closeParensRe : /\)/g,
 
 
-	// @if DEBUG
 <span id='Autolinker-matcher-Url-method-constructor'>	/**
 </span>	 * @constructor
 	 * @param {Object} cfg The configuration properties for the Match instance,
 	 *   specified in an Object (map).
 	 */
-	constructor : function() {
-		Autolinker.matcher.Matcher.prototype.constructor.apply( this, arguments );
+	constructor : function( cfg ) {
+		Autolinker.matcher.Matcher.prototype.constructor.call( this, cfg );
 
+		this.stripPrefix = cfg.stripPrefix;
+
+		// @if DEBUG
 		if( this.stripPrefix == null ) throw new Error( &#39;`stripPrefix` cfg required&#39; );
+		// @endif
 	},
-	// @endif
 
 
 <span id='Autolinker-matcher-Url-method-parseMatches'>	/**
@@ -167,6 +170,7 @@ Autolinker.matcher.Url = Autolinker.Util.extend( Autolinker.matcher.Matcher, {
 	parseMatches : function( text ) {
 		var matcherRegex = this.matcherRegex,
 		    stripPrefix = this.stripPrefix,
+		    tagBuilder = this.tagBuilder,
 		    matches = [],
 		    match;
 
@@ -215,15 +219,16 @@ Autolinker.matcher.Url = Autolinker.Util.extend( Autolinker.matcher.Matcher, {
 			var urlMatchType = schemeUrlMatch ? &#39;scheme&#39; : ( wwwUrlMatch ? &#39;www&#39; : &#39;tld&#39; ),
 			    protocolUrlMatch = !!schemeUrlMatch;
 
-			matches.push( new Autolinker.match.Url(
-				matchStr,
-				offset,
-				matchStr,  // url
-				urlMatchType,
-				protocolUrlMatch,
-				!!protocolRelativeMatch,
-				stripPrefix
-			) );
+			matches.push( new Autolinker.match.Url( {
+				tagBuilder            : tagBuilder,
+				matchedText           : matchStr,
+				offset                : offset,
+				urlMatchType          : urlMatchType,
+				url                   : matchStr,
+				protocolUrlMatch      : protocolUrlMatch,
+				protocolRelativeMatch : !!protocolRelativeMatch,
+				stripPrefix           : stripPrefix
+			} ) );
 		}
 
 		return matches;

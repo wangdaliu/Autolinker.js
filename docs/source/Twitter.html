@@ -26,9 +26,8 @@
  */
 Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 
-<span id='Autolinker-match-Twitter-property-twitterHandle'>	/**
-</span>	 * @protected
-	 * @property {String} twitterHandle (required)
+<span id='Autolinker-match-Twitter-cfg-twitterHandle'>	/**
+</span>	 * @cfg {String} twitterHandle (required)
 	 *
 	 * The Twitter handle that was matched, without the &#39;@&#39; character.
 	 */
@@ -36,20 +35,17 @@ Autolinker.match.Twitter = Autolinker.Util.extend( Autolinker.match.Match, {
 
 <span id='Autolinker-match-Twitter-method-constructor'>	/**
 </span>	 * @constructor
-	 * @param {String} matchedText The original text that was matched.
-	 * @param {Number} offset The offset of where the match was made in the
-	 *   input string.
-	 * @param {String} twitterHandle The Twitter handle that was matched,
-	 *   without the &#39;@&#39; character.
+	 * @param {Object} cfg The configuration properties for the Match
+	 *   instance, specified in an Object (map).
 	 */
-	constructor : function( matchedText, offset, twitterHandle ) {
-		Autolinker.match.Match.prototype.constructor.call( this, matchedText, offset );
+	constructor : function( cfg) {
+		Autolinker.match.Match.prototype.constructor.call( this, cfg );
 
 		// @if DEBUG
-		if( !twitterHandle ) throw new Error( &#39;`twitterHandle` arg required&#39; );
+		if( !cfg.twitterHandle ) throw new Error( &#39;`twitterHandle` cfg required&#39; );
 		// @endif
 
-		this.twitterHandle = twitterHandle;
+		this.twitterHandle = cfg.twitterHandle;
 	},
 
 
