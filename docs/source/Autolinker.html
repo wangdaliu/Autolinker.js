@@ -128,6 +128,8 @@
 var Autolinker = function( cfg ) {
 	cfg = cfg || {};
 
+	this.version = Autolinker.version;
+
 	this.urls = this.normalizeUrlsCfg( cfg.urls );
 	this.email = typeof cfg.email === &#39;boolean&#39; ? cfg.email : true;
 	this.twitter = typeof cfg.twitter === &#39;boolean&#39; ? cfg.twitter : true;
@@ -150,6 +152,47 @@ var Autolinker = function( cfg ) {
 	this.matchers = null;
 	this.tagBuilder = null;
 };
+
+
+
+<span id='Autolinker-static-method-link'>/**
+</span> * Automatically links URLs, Email addresses, Phone Numbers, Twitter handles,
+ * and Hashtags found in the given chunk of HTML. Does not link URLs found
+ * within HTML tags.
+ *
+ * For instance, if given the text: `You should go to http://www.yahoo.com`,
+ * then the result will be `You should go to &amp;lt;a href=&quot;http://www.yahoo.com&quot;&amp;gt;http://www.yahoo.com&amp;lt;/a&amp;gt;`
+ *
+ * Example:
+ *
+ *     var linkedText = Autolinker.link( &quot;Go to google.com&quot;, { newWindow: false } );
+ *     // Produces: &quot;Go to &lt;a href=&quot;http://google.com&quot;&gt;google.com&lt;/a&gt;&quot;
+ *
+ * @static
+ * @param {String} textOrHtml The HTML or text to find matches within (depending
+ *   on if the {@link #urls}, {@link #email}, {@link #phone}, {@link #twitter},
+ *   and {@link #hashtag} options are enabled).
+ * @param {Object} [options] Any of the configuration options for the Autolinker
+ *   class, specified in an Object (map). See the class description for an
+ *   example call.
+ * @return {String} The HTML text, with matches automatically linked.
+ */
+Autolinker.link = function( textOrHtml, options ) {
+	var autolinker = new Autolinker( options );
+	return autolinker.link( textOrHtml );
+};
+
+
+<span id='Autolinker-static-property-version'>/**
+</span> * @static
+ * @property {String} version (readonly)
+ *
+ * The Autolinker version number in the form major.minor.patch
+ *
+ * Ex: 0.25.1
+ */
+Autolinker.version = &#39;/* @echo VERSION */&#39;;
+
 
 Autolinker.prototype = {
 	constructor : Autolinker,  // fix constructor property
@@ -225,7 +268,7 @@ Autolinker.prototype = {
 	 */
 
 <span id='Autolinker-cfg-truncate'>	/**
-</span>	 * @cfg {Number/Object} truncate
+</span>	 * @cfg {Number/Object} [truncate=0]
 	 *
 	 * ## Number Form
 	 *
@@ -243,6 +286,9 @@ Autolinker.prototype = {
 	 *     truncate: 25
 	 *
 	 *
+	 *  Defaults to `0` for &quot;no truncation.&quot;
+	 *
+	 *
 	 * ## Object Form
 	 *
 	 * An Object may also be provided with two properties: `length` (Number) and
@@ -253,8 +299,8 @@ Autolinker.prototype = {
 	 *
 	 *     truncate: { length: 25, location: &#39;middle&#39; }
 	 *
-	 * @cfg {Number} truncate.length How many characters to allow before
-	 *   truncation will occur.
+	 * @cfg {Number} [truncate.length=0] How many characters to allow before
+	 *   truncation will occur. Defaults to `0` for &quot;no truncation.&quot;
 	 * @cfg {&quot;end&quot;/&quot;middle&quot;/&quot;smart&quot;} [truncate.location=&quot;end&quot;]
 	 *
 	 * - &#39;end&#39; (default): will truncate up to the number of characters, and then
@@ -303,6 +349,14 @@ Autolinker.prototype = {
 	 *   for details.
 	 */
 
+
+<span id='Autolinker-property-version'>	/**
+</span>	 * @property {String} version (readonly)
+	 *
+	 * The Autolinker version number in the form major.minor.patch
+	 *
+	 * Ex: 0.25.1
+	 */
 
 <span id='Autolinker-property-htmlParser'>	/**
 </span>	 * @private
@@ -699,34 +753,6 @@ Autolinker.prototype = {
 		return tagBuilder;
 	}
 
-};
-
-
-<span id='Autolinker-static-method-link'>/**
-</span> * Automatically links URLs, Email addresses, Phone Numbers, Twitter handles,
- * and Hashtags found in the given chunk of HTML. Does not link URLs found
- * within HTML tags.
- *
- * For instance, if given the text: `You should go to http://www.yahoo.com`,
- * then the result will be `You should go to &amp;lt;a href=&quot;http://www.yahoo.com&quot;&amp;gt;http://www.yahoo.com&amp;lt;/a&amp;gt;`
- *
- * Example:
- *
- *     var linkedText = Autolinker.link( &quot;Go to google.com&quot;, { newWindow: false } );
- *     // Produces: &quot;Go to &lt;a href=&quot;http://google.com&quot;&gt;google.com&lt;/a&gt;&quot;
- *
- * @static
- * @param {String} textOrHtml The HTML or text to find matches within (depending
- *   on if the {@link #urls}, {@link #email}, {@link #phone}, {@link #twitter},
- *   and {@link #hashtag} options are enabled).
- * @param {Object} [options] Any of the configuration options for the Autolinker
- *   class, specified in an Object (map). See the class description for an
- *   example call.
- * @return {String} The HTML text, with matches automatically linked.
- */
-Autolinker.link = function( textOrHtml, options ) {
-	var autolinker = new Autolinker( options );
-	return autolinker.link( textOrHtml );
 };
 
 

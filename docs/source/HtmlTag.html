@@ -63,7 +63,7 @@
  *
  *     var html = Autolinker.link( &quot;Test google.com&quot;, {
  *         replaceFn : function( autolinker, match ) {
- *             var tag = autolinker.getTagBuilder().build( match );  // returns an {@link Autolinker.HtmlTag} instance, configured with the Match&#39;s href and anchor text
+ *             var tag = match.buildTag();  // returns an {@link Autolinker.HtmlTag} instance, configured with the Match&#39;s href and anchor text
  *             tag.setAttr( &#39;rel&#39;, &#39;nofollow&#39; );
  *
  *             return tag;
